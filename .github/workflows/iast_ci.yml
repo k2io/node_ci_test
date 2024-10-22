@@ -59,7 +59,7 @@ jobs:
         run: |
           curl -X GET 'http://localhost:3000/rce/attack?payload=ls'
        
-      - name: Wait for 60 seconds
+      - name: Waiting 60 seconds for IAST prob
         run: |
           sleep 60
 
