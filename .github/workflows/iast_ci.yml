@@ -43,17 +43,21 @@ jobs:
         run: |
           sleep 30
 
-      - name: Fire HTTP request to the application
-        uses: fjogeleit/http-request-action@v1
-        id: http
-        with:
-          url: 'http://localhost:3000/rce/attack?payload=ls'
-          method: 'GET'
+      # - name: Fire HTTP request to the application
+      #   uses: fjogeleit/http-request-action@v1
+      #   id: http
+      #   with:
+      #     url: 'http://localhost:3000/rce/attack?payload=ls'
+      #     method: 'GET'
 
-      - name: Print response
+      # - name: Print response
+      #   run: |
+      #     echo "Response status code: ${{ steps.http.outputs.status }}"
+      #     echo "Response body: ${{ steps.http.outputs.response }}"
+
+      - name: Fire request on application
         run: |
-          echo "Response status code: ${{ steps.http.outputs.status }}"
-          echo "Response body: ${{ steps.http.outputs.response }}"
+          curl -X GET 'http://localhost:3000/rce/attack?payload=ls'
        
       - name: Wait for 60 seconds
         run: |
