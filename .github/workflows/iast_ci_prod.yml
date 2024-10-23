@@ -1,0 +1,84 @@
+name: IAST CI/CD 
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  launch-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Install New Relic agent
+        run: |
+          npm install "https://github.com/k2io/node-newrelic-fork/#ci_support"
+
+      - name: Configure New Relic agent
+        env:
+          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY_PROD }}
+          NEW_RELIC_APP_NAME: My Express App
+          NEW_RELIC_SECURITY_IAST_TEST_IDENTIFIER: ${{ github.run_id }}
+          API_KEY: ${{ secrets.API_KEY_PROD }}
+          ACCOUNT_ID: ${{ secrets.ACCOUNT_ID_PROD }}
+          NEW_RELIC_SECURITY_VALIDATOR_SERVICE_URL: wss://csec.nr-data.net
+          NEW_RELIC_HOST: collector.newrelic.com
+
+        run: |
+          echo "NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY" >> .env
+          echo "NEW_RELIC_APP_NAME=$NEW_RELIC_APP_NAME" >> .env
+          echo "NEW_RELIC_SECURITY_IAST_TEST_IDENTIFIER=$NEW_RELIC_SECURITY_IAST_TEST_IDENTIFIER" >> .env
+          echo "ACCOUNT_ID=$ACCOUNT_ID" >> .env
+          echo "API_KEY=$API_KEY" >> .env
+          echo "NEW_RELIC_SECURITY_VALIDATOR_SERVICE_URL=$NEW_RELIC_SECURITY_VALIDATOR_SERVICE_URL" >> .env
+          echo "NEW_RELIC_HOST=$NEW_RELIC_HOST" >> .env
+
+      - name: Start Express app with New Relic agent
+        run: |
+          node index.js /dev/null 2>&1 &
+        env:
+          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+          NEW_RELIC_APP_NAME: My Express App
+          NEW_RELIC_SECURITY_IAST_TEST_IDENTIFIER: ${{ github.run_id }}
+
+      - name: Wait for 30 seconds
+        run: |
+          sleep 30
+
+      # - name: Fire HTTP request to the application
+      #   uses: fjogeleit/http-request-action@v1
+      #   id: http
+      #   with:
+      #     url: 'http://localhost:3000/rce/attack?payload=ls'
+      #     method: 'GET'
+
+      # - name: Print response
+      #   run: |
+      #     echo "Response status code: ${{ steps.http.outputs.status }}"
+      #     echo "Response body: ${{ steps.http.outputs.response }}"
+
+      - name: Fire request on application
+        run: |
+          curl -X GET 'http://localhost:3000/rce/attack?payload=ls'
+       
+      - name: Waiting 60 seconds for IAST prob
+        run: |
+          sleep 60
+
+      - name: Fetching IAST analysis result based on iast_test_identifier
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
+        run: |
+         curl --location 'https://api.newrelic.com/graphql' \
+          --header 'Api-Key: ${{ secrets.API_KEY_PROD }}' \
+          --header 'Content-Type: application/json' \
+          --data '{  "query": "{\n  actor {\n    account(id: ${{ secrets.ACCOUNT_ID_PROD }}) {\n      nrql(query: \"SELECT entityGuid, entityName, exploitable_vulnerability, severityLevel, fileName, methodName, lineNumber, language FROM (FROM CsecIastTrace SELECT latest(linkingMetadata.entity.guid) as entityGuid, latest(linkingMetadata.entity.name) as entityName, latest(vulnerabilityCaseType) as exploitable_vulnerability, latest(severityLevel) as severityLevel, latest(userFileName) as fileName, latest(userMethodName) as methodName, latest(lineNumber) as lineNumber, latest(collectorType) as language, latest(userProvidedTestIdentifier) as userProvidedTestIdentifier WHERE userProvidedTestIdentifier = '\''${{ github.run_id }}'\''  limit max facet appEntityGuid, apiId, scanId, recordIndex) \") {\n        results\n      }\n    }\n  }\n}"}'
+
+
+
+     
+      
