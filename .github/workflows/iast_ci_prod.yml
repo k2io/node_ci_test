@@ -1,4 +1,4 @@
-name: IAST CI/CD 
+name: IAST CI/CD prod
 
 on: [push, pull_request, workflow_dispatch]
 
