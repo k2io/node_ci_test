@@ -70,8 +70,8 @@ jobs:
 
       - name: Fetching IAST analysis result based on iast_test_identifier
         env:
-          API_KEY: ${{ secrets.API_KEY }}
-          ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
+          API_KEY: ${{ secrets.API_KEY_PROD }}
+          ACCOUNT_ID: ${{ secrets.ACCOUNT_ID_PROD }}
         run: |
          curl --location 'https://api.newrelic.com/graphql' \
           --header 'Api-Key: ${{ secrets.API_KEY_PROD }}' \
