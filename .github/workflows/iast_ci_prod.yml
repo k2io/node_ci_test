@@ -77,7 +77,7 @@ jobs:
           API_KEY: ${{ secrets.API_KEY_PROD }}
           ACCOUNT_ID: ${{ secrets.ACCOUNT_ID_PROD }}
         run: |
-         curl --location 'https://api.newrelic.com/graphql' \
+         curl --location 'https://api.eu.newrelic.com/graphql' \
           --header 'Api-Key: ${{ secrets.API_KEY_PROD }}' \
           --header 'Content-Type: application/json' \
           --data '{  "query": "{\n  actor {\n    account(id: ${{ secrets.ACCOUNT_ID_PROD }}) {\n      nrql(query: \"SELECT entityGuid, entityName, exploitable_vulnerability, severityLevel, fileName, methodName, lineNumber, language FROM (FROM CsecIastTrace SELECT latest(linkingMetadata.entity.guid) as entityGuid, latest(linkingMetadata.entity.name) as entityName, latest(vulnerabilityCaseType) as exploitable_vulnerability, latest(severityLevel) as severityLevel, latest(userFileName) as fileName, latest(userMethodName) as methodName, latest(lineNumber) as lineNumber, latest(collectorType) as language, latest(userProvidedTestIdentifier) as userProvidedTestIdentifier WHERE userProvidedTestIdentifier = '\''${{ github.run_id }}'\''  limit max facet appEntityGuid, apiId, scanId, recordIndex) \") {\n        results\n      }\n    }\n  }\n}"}'
