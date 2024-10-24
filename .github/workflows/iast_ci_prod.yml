@@ -24,7 +24,7 @@ jobs:
           NEW_RELIC_SECURITY_IAST_TEST_IDENTIFIER: ${{ github.run_id }}
           API_KEY: ${{ secrets.API_KEY_PROD }}
           ACCOUNT_ID: ${{ secrets.ACCOUNT_ID_PROD }}
-          NEW_RELIC_SECURITY_VALIDATOR_SERVICE_URL: wss://csec.nr-data.net
+          NEW_RELIC_SECURITY_VALIDATOR_SERVICE_URL: wss://csec.eu01.nr-data.net
           NEW_RELIC_HOST: collector.newrelic.com
 
         run: |
@@ -42,7 +42,7 @@ jobs:
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY_PROD }}
           NEW_RELIC_HOST: collector.newrelic.com
-          NEW_RELIC_SECURITY_VALIDATOR_SERVICE_URL: wss://csec.nr-data.net
+          NEW_RELIC_SECURITY_VALIDATOR_SERVICE_URL: wss://csec.eu01.nr-data.net
           NEW_RELIC_APP_NAME: My Express App
           NEW_RELIC_SECURITY_IAST_TEST_IDENTIFIER: ${{ github.run_id }}
           NEW_RELIC_LOG_LEVEL: debug
