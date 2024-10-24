@@ -25,7 +25,7 @@ jobs:
           API_KEY: ${{ secrets.API_KEY_PROD }}
           ACCOUNT_ID: ${{ secrets.ACCOUNT_ID_PROD }}
           NEW_RELIC_SECURITY_VALIDATOR_SERVICE_URL: wss://csec.eu01.nr-data.net
-          NEW_RELIC_HOST: collector.newrelic.com
+          NEW_RELIC_HOST: collector.eu.newrelic.com
 
         run: |
           echo "NEW_RELIC_LICENSE_KEY=$NEW_RELIC_LICENSE_KEY" >> .env
@@ -41,7 +41,7 @@ jobs:
           node index.js /dev/null 2>&1 &
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY_PROD }}
-          NEW_RELIC_HOST: collector.newrelic.com
+          NEW_RELIC_HOST: collector.eu.newrelic.com
           NEW_RELIC_SECURITY_VALIDATOR_SERVICE_URL: wss://csec.eu01.nr-data.net
           NEW_RELIC_APP_NAME: My Express App
           NEW_RELIC_SECURITY_IAST_TEST_IDENTIFIER: ${{ github.run_id }}
